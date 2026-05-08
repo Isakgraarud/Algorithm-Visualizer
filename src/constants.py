@@ -2,7 +2,7 @@
 WINDOW_TITLE = "Algorithm Visualizer"
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 450
-BAR_NR = 50
+BAR_NR = 5
 
 # Colors
 BG_COLOR = "#2c3e50"
