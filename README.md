@@ -6,3 +6,7 @@ A python based Algorithm Visualizer
 
 ![IMG_1](photos/img_1.png)
 ![IMG_2](photos/img_2.png)
+
+## HOW TO ADD MORE SORTING ALGORITHMS
+- Create a sorting algorithm in sortingAlgorithms (simple as that)
+- PS: must be .py
