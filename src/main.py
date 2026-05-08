@@ -1,5 +1,5 @@
 import tkinter as tk
-from visualizer import SortingVisualizer
+from src.visualizer import SortingVisualizer
 from src.sortingAlgorithms.bubble_sort import BubbleSort
 from src.sortingAlgorithms.bogo_sort import BogoSort
 
