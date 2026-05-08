@@ -5,7 +5,7 @@ import inspect
 from src.visualizer import SortingVisualizer
 from pathlib import Path
 
-def getSortignAlgorithms():
+def getSortingAlgorithms():
     available_algorithms = {}
     path = Path(__file__).parent / "sortingAlgorithms"
 
@@ -27,7 +27,7 @@ def getSortignAlgorithms():
 def main():
     root = tk.Tk()
 
-    available_algorithms = getSortignAlgorithms()
+    available_algorithms = getSortingAlgorithms()
 
     app = SortingVisualizer(root, available_algorithms)
     root.mainloop()
