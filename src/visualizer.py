@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 import random
 from src import constants as c
@@ -43,12 +44,12 @@ class SortingVisualizer:
 
     def generate_data(self):
         if self.is_sorting: return
-        self.data = [random.randint(c.MIN_VAL, c.MAX_VAL) for _ in range(c.BAR_NR)]
+        self.data = [random.randint(c.MIN_VAL, c.MAX_VAL) for _ in range(c.NR_OF_ELEMENTS)]
         self.draw_data([c.BAR_DEFAULT_COLOR for _ in range(len(self.data))])
 
     def draw_data(self, color_list):
         self.canvas.delete("all")
-        bar_width = c.SCREEN_WIDTH / c.BAR_NR
+        bar_width = c.SCREEN_WIDTH / c.NR_OF_ELEMENTS
         for i, val in enumerate(self.data):
             x0, y0 = i * bar_width, c.SCREEN_HEIGHT - val
             x1, y1 = (i + 1) * bar_width, c.SCREEN_HEIGHT
@@ -65,7 +66,8 @@ class SortingVisualizer:
                 if 0 <= idx < len(colors):
                     colors[idx] = c.BAR_ACTIVE_COLOR
             self.draw_data(colors)
-            self.screen.after(100, lambda: self.animate_sort(generator))
+            delay = max(0, int(c.DELAY_CONST / math.log2(len(self.data) + 1)))
+            self.screen.after(delay, lambda: self.animate_sort(generator))
         except StopIteration:
             self.draw_data([c.BAR_SORTED_COLOR for _ in range(len(self.data))])
             self.is_sorting = False
