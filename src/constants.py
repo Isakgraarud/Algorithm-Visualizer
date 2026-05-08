@@ -1,0 +1,16 @@
+# --- Configuration & Styling ---
+WINDOW_TITLE = "Algorithm Visualizer"
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 450
+BAR_NR = 10
+
+# Colors
+BG_COLOR = "#2c3e50"
+BAR_DEFAULT_COLOR = "#3498db"
+BAR_ACTIVE_COLOR = "#e74c3c"
+BAR_SORTED_COLOR = "#2ecc71"
+BAR_OUTLINE_COLOR = "#34495e"
+
+# Data Range
+MIN_VAL = 20
+MAX_VAL = SCREEN_HEIGHT - 50
