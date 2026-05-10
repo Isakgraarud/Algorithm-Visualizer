@@ -1,34 +1,69 @@
+from src.sort_step import SortStep
+from src import constants as c
+
+
 class StalinSort:
     """
-    Stalin Sort Implementation
+    Stalin Sort removes any element smaller than the previous one.
+    The result is a sorted subsequence — the non-conforming elements are purged.
 
-    Stalin Sort is a humorous, non-functional sorting algorithm that enforces
-    order through elimination. It iterates through the list once and "exiles"
-    (removes) any element that is smaller than the previous one. What remains
-    is, by definition, a non-decreasing sequence.
-
-    Note: This algorithm is destructive. It does NOT sort the original data;
-    it produces a sorted subsequence by discarding any element that dares to
-    step out of line.
-
-    Complexity:
-    - Best Case: O(n) - The list is already sorted; no elements are removed.
-    - Average Case: O(n)
-    - Worst Case: O(n) - A single pass is always sufficient.
-    - Space Complexity: O(1) (in-place mutation of the input list).
+    Complexity: O(n) — a single destructive pass.
 
     (@link https://github.com/gustavo-depaula/stalin-sort 08.05.2026)
     """
 
+    PSEUDOCODE = [
+        "result = [data[0]]",
+        "for each element e in data[1:]:",
+        "  if e >= result.last:",
+        "    result.append(e)",
+        "  else:",
+        "    remove(e)  # send to gulag",
+    ]
+
+    COMPLEXITY = {
+        "best":    "O(n)",
+        "average": "O(n)",
+        "worst":   "O(n)",
+        "space":   "O(1)",
+    }
+
     @staticmethod
     def run(data):
-        yield data, []
-
+        yield SortStep(
+            data=data,
+            pseudocode_line=0,
+            log="Stalin Sort: non-conforming elements will be purged",
+        )
         i = 1
+        purged = 0
         while i < len(data):
+            yield SortStep(
+                data=data,
+                color_map={i: c.ROLE_COMPARING, i - 1: c.ROLE_MIN},
+                variables={"i": i, "purged": purged},
+                pseudocode_line=2,
+                log=f"Inspect data[{i}]={data[i]} vs data[{i-1}]={data[i-1]}",
+                comparisons_delta=1,
+            )
             if data[i] < data[i - 1]:
+                val = data[i]
                 del data[i]
-                yield data, [i - 1] if i - 1 < len(data) else []
+                purged += 1
+                highlight = i - 1 if i - 1 < len(data) else len(data) - 1
+                yield SortStep(
+                    data=data,
+                    color_map={highlight: c.ROLE_COMPARING} if highlight >= 0 else {},
+                    variables={"i": i, "purged": purged},
+                    pseudocode_line=5,
+                    log=f"Purged {val} — does not conform",
+                )
             else:
-                yield data, [i - 1, i]
+                yield SortStep(
+                    data=data,
+                    color_map={i: c.ROLE_SORTED, i - 1: c.ROLE_SORTED},
+                    variables={"i": i, "purged": purged},
+                    pseudocode_line=3,
+                    log=f"data[{i}]={data[i]} conforms — kept",
+                )
                 i += 1
