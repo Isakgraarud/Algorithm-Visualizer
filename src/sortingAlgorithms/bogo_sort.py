@@ -1,30 +1,52 @@
 import random
+from src.sort_step import SortStep
+from src import constants as c
+
 
 class BogoSort:
-
     """
-    Bogosort (also known as Monkey Sort, Stupid Sort, or Slowsort) implementation.
-
-    Bogosort is an extremely inefficient, non-functional sorting algorithm based on
-    the 'generate and test' paradigm. It works by randomly shuffling an input list,
-    checking if it is sorted, and repeating this process until the list is
-    miraculously in order.
+    Bogosort randomly shuffles until the array is sorted.
 
     Complexity:
-    - Best Case: O(n) - The list is already sorted.
-    - Average Case: O(n * n!) - For large n, this is computationally unfeasible.
-    - Worst Case: Unbounded (Infinite) - It is theoretically possible to never shuffle
-      the list into the correct order.
-    - Space Complexity: O(1)
+    - Best Case:  O(n)      (already sorted)
+    - Average:    O(n·n!)
+    - Worst Case: Unbounded
+    - Space:      O(1)
 
     (@link https://en.wikipedia.org/wiki/Bogosort 08.05.2026)
     """
 
+    PSEUDOCODE = [
+        "while not is_sorted(data):",
+        "  shuffle(data)",
+        "def is_sorted(data):",
+        "  for i in range(n-1):",
+        "    if data[i] > data[i+1]: return False",
+        "  return True",
+    ]
+
+    COMPLEXITY = {
+        "best":    "O(n)",
+        "average": "O(n·n!)",
+        "worst":   "Unbounded",
+        "space":   "O(1)",
+    }
+
     @staticmethod
     def run(data):
         def is_sorted(arr):
-            return all(arr[i] <= arr[i+1] for i in range(len(arr)-1))
+            return all(arr[i] <= arr[i + 1] for i in range(len(arr) - 1))
 
+        attempts = 0
         while not is_sorted(data):
             random.shuffle(data)
-            yield data, [random.randint(0, len(data)-1)]
+            attempts += 1
+            rng = random.randint(0, len(data) - 1)
+            yield SortStep(
+                data=data,
+                color_map={rng: c.ROLE_COMPARING},
+                variables={"attempts": attempts},
+                pseudocode_line=1,
+                log=f"Shuffle #{attempts} — still not sorted",
+                comparisons_delta=len(data) - 1,
+            )

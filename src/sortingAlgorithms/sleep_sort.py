@@ -1,50 +1,63 @@
 import threading
 import time
 import queue
-from ..constants import MIN_VAL
+
+from src.sort_step import SortStep
+from src import constants as c
+
 
 class SleepSort:
     """
-    Sleep Sort Implementation
-
-    Sleep Sort is an unconventional, concurrency-based sorting algorithm. For
-    each element in the list, a thread is spawned that sleeps for a duration
-    proportional to the element's value before "reporting in." Because larger
-    values sleep longer, the threads naturally finish in ascending order,
-    producing a sorted sequence as a side effect of OS scheduling.
-
-    In this visualization, each thread sleeps for a number of milliseconds
-    equal to its bar height — so taller bars literally take longer to wake up.
-
-    Note: This algorithm does NOT work correctly for negative numbers, and its
-    accuracy depends on thread scheduling precision.
+    Each element spawns a thread that sleeps proportional to its value.
+    Threads wake up in order, naturally producing a sorted sequence.
 
     Complexity:
-    - Time: O(max(arr) + n) - dominated by the largest element's sleep time.
-    - Space: O(n) - one thread per element.
+    - Time:  O(max(arr) + n) — dominated by the largest element's sleep
+    - Space: O(n)            — one thread per element
 
     (@link https://en.wikipedia.org/wiki/Sleep_sort)
     """
+
+    PSEUDOCODE = [
+        "for each element e in data:",
+        "  spawn thread: sleep(e/scale), emit e",
+        "start all threads",
+        "sorted = []",
+        "while len(sorted) < n:",
+        "  e = queue.get()",
+        "  sorted.append(e)",
+    ]
+
+    COMPLEXITY = {
+        "best":    "O(n + max)",
+        "average": "O(n + max)",
+        "worst":   "O(n + max)",
+        "space":   "O(n)",
+    }
 
     @staticmethod
     def run(data):
         if not data:
             return
 
-        result_queue = queue.Queue()
+        result_queue: queue.Queue = queue.Queue()
         original = list(data)
+        scale = max(c.MIN_VAL, 1)
 
         def worker(num):
-            time.sleep(num / MIN_VAL)
+            time.sleep(num / scale * 0.15)
             result_queue.put(num)
 
-        threads = []
-        for num in original:
-            t = threading.Thread(target=worker, args=(num,), daemon=True)
-            threads.append(t)
+        threads = [threading.Thread(target=worker, args=(v,), daemon=True) for v in original]
+        for t in threads:
             t.start()
 
-        yield data, []
+        yield SortStep(
+            data=data,
+            variables={"n": len(original), "threads": len(threads)},
+            pseudocode_line=2,
+            log=f"Spawned {len(threads)} threads — waiting for them to wake up",
+        )
 
         sorted_values = []
         remaining = list(original)
@@ -54,14 +67,25 @@ class SleepSort:
                 num = result_queue.get_nowait()
                 sorted_values.append(num)
                 remaining.remove(num)
-
                 new_data = sorted_values + remaining
                 data.clear()
                 data.extend(new_data)
-
-                yield data, [len(sorted_values) - 1]
+                idx = len(sorted_values) - 1
+                yield SortStep(
+                    data=data,
+                    color_map={idx: c.ROLE_SORTED},
+                    sorted_set=set(range(len(sorted_values))),
+                    variables={"sorted": len(sorted_values), "remaining": len(remaining)},
+                    pseudocode_line=6,
+                    log=f"Thread for value {num} woke up — placed at index {idx}",
+                )
             except queue.Empty:
-                yield data, []
+                yield SortStep(
+                    data=data,
+                    sorted_set=set(range(len(sorted_values))),
+                    variables={"sorted": len(sorted_values), "remaining": len(remaining)},
+                    pseudocode_line=4,
+                )
 
         for t in threads:
             t.join(timeout=0.1)
